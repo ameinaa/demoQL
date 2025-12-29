@@ -1,0 +1,90 @@
+type Author {
+  idAuthor: ID!
+  name: String!
+  age: Int
+  nationality: String
+  books: [Book!]
+}
+
+type Category {
+  idC: ID!
+  categoryName: String!
+  parentCategory: Category
+  subCategories: [Category!]
+  books: [Book!]
+}
+
+type Book {
+  idBook: ID!
+  title: String!
+  publicationYear: Int
+  language: String
+  nbPages: Int
+  category: Category
+  author: Author
+}
+
+type PageInfo {
+  totalItems: Int!
+  itemsLeft: Int!
+  hasMore: Boolean!
+  pageNumber: Int!
+  pageSize: Int!
+}
+
+type BookPage {
+  list: [Book!]!
+  pageInfo: PageInfo!
+}
+
+union SearchResult = Book | Author | Category
+
+type SearchPage {
+  list: [SearchResult!]!
+  pageInfo: PageInfo!
+}
+
+input BookInput {
+  title: String!
+  publicationYear: Int
+  language: String
+  nbPages: Int
+  idC: Int!
+  idAuthor: Int!
+}
+
+enum SearchType {
+  BOOK
+  AUTHOR
+  CATEGORY
+  ALL
+}
+
+type Query {
+  books(
+    page: Int = 0
+    size: Int = 10
+    publicationYear: Int
+    language: String
+    idCategory: Int
+    recursive: Boolean = false
+  ): BookPage!
+
+  booksByAuthor(idAuthor: Int!): [Book!]!
+
+  search(
+    keyword: String!
+    type: SearchType = ALL
+    page: Int = 0
+    size: Int = 10
+  ): SearchPage!
+
+  author(idA: Int!): Author
+  book(idBook: Int!): Book
+  category(idC: Int!): Category
+}
+
+type Mutation {
+  addBook(book: BookInput!): Book!
+  deleteAuthor(idA: Int!): Boolean!
+}
